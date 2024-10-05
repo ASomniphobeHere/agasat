@@ -1,0 +1,77 @@
+You have several black and white satellite images, where black pixels represent low values and white pixels represent high values of a given measurement.
+
+You can use these function to perform data analysis and create a dataset that closely answers the users question.
+    def multiply_masks(image1, image2):
+    ""
+    Multiply to isolate regions where both images are strong. 
+    Behavior: High overlap areas become brighter, places where at least one value is low turn dark.
+    ""
+
+def invert_bw_image(image):
+    ""
+    Reverse values to emphasize regions with initially low values.
+    Behavior: Black areas turn white and vice versa, revealing low-value patterns.
+    ""
+
+def weighted_average(image_list, weight_list):
+    ""
+    Combine images to reflect varying dataset importance.
+    Behavior: Blends images, emphasizing regions based on weights. Weights should sum to 1.
+    ""
+
+def pixel_threshold(image, threshold_value=128):
+    ""
+    Mark regions that surpass a set intensity.
+    Behavior: Pixels above the threshold turn white; others darken.
+    ""
+
+def edge_detection(image, min_val=100, max_val=200):
+    ""
+    Identify sudden changes in pixel values.
+    Behavior: Creates thin outlines highlighting boundaries.
+    ""
+
+def gaussian_blur(image, kernel_size=(5, 5), sigma=0):
+    ""
+    Smooth the image to reduce sharp transitions.
+    Behavior: Blurs noise and small details to show general trends.
+    ""
+
+These are the datasets that are available:
+{
+	"light": Light pollution, low values means low pollution
+}
+
+You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
+Try to make the model as simple as possible(use the least number of datasets) while also actually taking all the highly relevant datasets.
+
+Give list of Relevant datasets, Best Location Qualities and a route to get that with applying functions. You should comment succinctly what you get after each function, what meaning it has.
+example
+Question: Where is the best location for a new wind farm?
+Answer:
+""
+Relevant Datasets: Wind speed, urban density, vegetation, elevation.
+Best Location: High wind speed, low urban density, low vegetation, and high elevation areas.
+Route:
+1. **pixel_threshold(wind_speed, threshold_value=128)**  
+   - Emphasize regions with high wind speeds, highlighting potential sites for wind turbines.
+   
+2. **invert_bw_image(urban_density)**  
+   - Convert low-density areas to white (desirable), avoiding populated regions.
+   
+3. **invert_bw_image(vegetation)**  
+   - Highlight areas with minimal vegetation, to avoid disruption of green spaces.
+
+4. **gaussian_blur(elevation, kernel_size=(5, 5))**  
+   - Smooth elevation data to emphasize general trends of high-altitude regions.
+
+5. **multiply_masks(step 1, step 2)**  
+   - Isolate regions with high wind speeds and low urban density.
+
+6. **multiply_masks(step 5, step 3)**  
+   - Further filter to exclude high-vegetation areas.
+
+7. **multiply_masks(step 6, step 4)**  
+   - Final mask of optimal locations considering all constraints.
+""
+Give very concise reasoning to what datasets positively or negatively impact the answer to the question, and what specific aspects of them.

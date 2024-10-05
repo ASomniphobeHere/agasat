@@ -54,7 +54,7 @@ class Data_get:
 
         image_data = normalized_data.astype(np.uint8)
 
-        image_resized = Image.fromarray(image_data).resize((10000, 10000))
+        image_resized = Image.fromarray(image_data).resize((1000, 1000))
 
         return self.__file_to_b64(image_resized)
     
@@ -80,7 +80,7 @@ class Data_get:
         
         lights = Image.open(out_stream)
         maped = lights.convert("L")
-        maped = maped.resize((10000, 10000))
+        maped = maped.resize((1000, 1000))
         return self.__file_to_b64(maped)
 
         
