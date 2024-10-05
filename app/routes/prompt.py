@@ -87,9 +87,18 @@ def process_input(input: TextInput):
     except Exception as e:
         return {"error": f"Failed to generate highlight points: {str(e)}"}
 
+    def img_coord_to_gps(x, y):
+        x_dal = x/1000.0
+        y_dal = y/1000.0
+        x_gps = input.coordinates[0] + x_dal*(input.coordinates[2] - input.coordinates[0])
+        y_gps = input.coordinates[1] + y_dal*(input.coordinates[3] - input.coordinates[1])
+        return (x_gps, y_gps)
+
+    highlight_points_coords = [img_coord_to_gps(x, y) for x, y in highlight_points]
+
     # Step 7: Create a template user response
     template_response = f"""
-    Found {len(highlight_points)} areas of interest based on your query. Here are the coordinates of these areas: {highlight_points}.
+    Found {len(highlight_points)} areas of interest based on your query. Here are the coordinates of these areas: {highlight_points_coords}.
     Relevant datasets: {', '.join(output_json['datasets'])}.
     """
 
@@ -98,7 +107,7 @@ def process_input(input: TextInput):
         "input": input.text,
         "response": template_response.strip(),
         "coordinates": input.coordinates,
-        "highlight_points": highlight_points,
+        "highlight_points": highlight_points_coords,
         "final_image_url": f"/prompt/image/{final_image_filename}"
     }
 
