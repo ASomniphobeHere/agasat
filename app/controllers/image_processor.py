@@ -127,6 +127,40 @@ class ImageProcessor:
 
         return centers
     
+    def map_grayscale_to_custom_colormap(grayscale_image, custom_colors=None, transparency_range=(0, 255)):
+        """
+        Maps the grayscale image values to a custom color map with transparency.
+
+        Args:
+        grayscale_image (np.array): Input grayscale image.
+        custom_colors (np.array): A list of colors defining the colormap.
+        transparency_range (tuple): Min and max transparency values for green colors.
+
+        Returns:
+        np.array: Transformed image with the custom colormap and transparency applied.
+        """
+        if custom_colors is None:
+            # Define a custom red-yellow-green color spectrum (colormap) with an RGBA format.
+            custom_colors = np.array([
+                [0, 0, 255, 255],      # Red (opaque)
+                [0, 128, 255, 255],    # Orange (opaque)
+                [0, 255, 255, 255],    # Yellow (opaque)
+                [0, 255, 128, 128],    # Light Green (semi-transparent)
+                [0, 255, 0, 64],        # Green (fully transparent)
+            ], dtype=np.uint8)
+        
+        # Normalize grayscale image values to the range of [0, len(custom_colors)-1]
+        norm_image = cv2.normalize(grayscale_image, None, 0, len(custom_colors) - 1, cv2.NORM_MINMAX).astype(np.uint8)
+
+        # Create an RGBA image where each pixel has 4 channels: [B, G, R, A]
+        colored_image = np.zeros((*grayscale_image.shape, 4), dtype=np.uint8)
+
+        # Map the normalized values to the custom RGBA colormap
+        for i in range(len(custom_colors)):
+            colored_image[norm_image == i] = custom_colors[i]
+
+        return colored_image
+    
     @staticmethod
     def multiply_masks(image1, image2):
         """
@@ -321,6 +355,31 @@ class ImageProcessor:
         - wait_time: Time to display the image (0 = wait indefinitely).
         """
         cv2.imshow(window_name, image)
+        cv2.waitKey(wait_time)
+        cv2.destroyAllWindows()
+
+    def show_image_with_transparency(image, window_name="Image", wait_time=0, background_color=(255, 255, 255)):
+        """
+        Displays an RGBA image with transparency simulated using a background color.
+
+        Parameters:
+        - image: RGBA image to display.
+        - window_name: Name of the display window.
+        - wait_time: Time to display the image (0 = wait indefinitely).
+        - background_color: Background color in [B, G, R] format.
+        """
+        # Separate the alpha channel
+        bgr_image = image[..., :3]
+        alpha_channel = image[..., 3] / 255.0  # Normalize alpha to [0, 1]
+
+        # Create a background image of the same size
+        background = np.full_like(bgr_image, background_color, dtype=np.uint8)
+
+        # Blend the image with the background using the alpha channel
+        blended_image = cv2.convertScaleAbs(bgr_image * alpha_channel[..., None] + background * (1 - alpha_channel[..., None]))
+
+        # Display the blended image
+        cv2.imshow(window_name, blended_image)
         cv2.waitKey(wait_time)
         cv2.destroyAllWindows()
 

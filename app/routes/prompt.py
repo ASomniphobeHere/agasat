@@ -74,13 +74,15 @@ def process_input(input: TextInput):
     executor = FunctionExecutor(datasets)
     try:
         final_image = executor.execute_functions(output_json)
+        color_final_image = ImageProcessor.map_grayscale_to_custom_colormap(final_image)
+        ImageProcessor.show_image_with_transparency(color_final_image, window_name="Final Image")  # Display the final image
     except Exception as e:
         return {"error": f"Failed to execute functions: {str(e)}"}
 
     # Step 5: Save the final result image to the server
     final_image_filename = f"{uuid.uuid4()}.png"
     final_image_path = os.path.join(output_dir, final_image_filename)
-    cv2.imwrite(final_image_path, final_image)
+    cv2.imwrite(final_image_path, color_final_image)
 
 
     # Step 6: Generate highlight points from the final image
