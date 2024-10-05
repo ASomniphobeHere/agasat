@@ -89,6 +89,9 @@ def process_input(input: TextInput):
         highlight_points = ImageProcessor.detect_bright_spots(final_image, blur_radius=(11, 11), min_area=100, max_spots=10)
     except Exception as e:
         return {"error": f"Failed to generate highlight points: {str(e)}"}
+    
+    image_with_h = ImageProcessor.visualize_centers(final_image, highlight_points, color=(0, 255, 0))
+    ImageProcessor.show_image(image_with_h, window_name="Highlight Points")
 
     def img_coord_to_gps(x, y):
         x_dal = x/1000.0

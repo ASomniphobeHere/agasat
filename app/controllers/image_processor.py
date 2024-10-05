@@ -55,7 +55,7 @@ class ImageProcessor:
             std_dev = std_dev[0][0]
 
             # Step 5: Set the initial brightness threshold (aggressive thresholding)
-            min_brightness = 160  # More aggressive to highlight strong bright spots
+            min_brightness = 220  # More aggressive to highlight strong bright spots
             logger.info(f"Min brightness: {min_brightness}")
 
             # Step 6: Apply aggressive threshold to get an initial bright spot mask
@@ -68,31 +68,23 @@ class ImageProcessor:
             num_labels, _, _, _ = cv2.connectedComponentsWithStats(thresh, connectivity=8)
 
             logger.info(f"num labels {num_labels}")
-            erosion_history.append(thresh)
+            best_thresh = thresh.copy()
+            max_comps = num_labels - 1
 
-            while num_labels < max_spots and num_labels > 1 and kernel_size < thresh.shape[0]-10:  # Continue until we have at least `max_spots` distinct components
+            while num_labels > 1 and kernel_size < thresh.shape[0]-10:  # Continue until we have at least `max_spots` distinct components
                 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
-                logger.debug("debug 1")
                 eroded = cv2.erode(thresh, kernel, iterations=1)
-                logger.debug("debug 2")
-                erosion_history.append(eroded)  # Store the erosion result
-                logger.debug("debug 3")
                 # ImageProcessor.show_image(eroded, f"Eroded with Kernel Size: {kernel_size}")
                 
                 # Count the number of distinct connected components
                 num_labels, _, _, _ = cv2.connectedComponentsWithStats(eroded, connectivity=8)
                 logger.info(f"Number of components with kernel size {kernel_size}: {num_labels - 1}")  # Exclude the background
                 
-                if num_labels >= max_spots:  # If we have at least `max_spots` bright spots
-                    break
+                if num_labels - 1 > max_comps:  # If we have at least `max_spots` bright spots
+                    max_comps = num_labels - 1
+                    best_thresh = eroded
 
                 kernel_size += 8  # Increase kernel size aggressively
-
-            # Step 8: Select the last valid erosion state where we had `max_spots` components
-            best_thresh = erosion_history[-2] if len(erosion_history) > 1 else thresh
-
-            # Step 9: Refine the selected erosion state with slight dilation to recover shape
-            # ImageProcessor.show_image(best_thresh, "Refined Threshold")
 
             # Step 10: Use OpenCV's connected components to label the thresholded image
             num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(best_thresh, connectivity=8, ltype=cv2.CV_32S)
