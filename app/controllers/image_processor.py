@@ -13,7 +13,7 @@ from app.utils.synthetic_data import SyntheticDataGenerator
 class ImageProcessor:
 
     @staticmethod
-    def detect_bright_spots(image, blur_radius=(11, 11), min_area=300, max_spots=5, initial_brightness_factor=1.5, step_factor=0.1):
+    def detect_bright_spots(image, blur_radius=(11, 11), min_area=100, max_spots=5, initial_brightness_factor=1.5, step_factor=0.1):
         """
         Detect and return the centers of the top bright spots in the given image, sorted by area.
 
@@ -42,9 +42,12 @@ class ImageProcessor:
             elif len(image.shape) != 2:  # If it's not single-channel or not a standard grayscale image
                 logger.error("Invalid image format: Expected a single-channel grayscale image.")
                 return []
+            
 
             # Step 3: Apply Gaussian blur to the grayscale image to smooth out noise
             blurred = cv2.GaussianBlur(image, blur_radius, 0)
+            blurred = ImageProcessor.normalize(blurred)
+            # ImageProcessor.show_image(blurred)
 
             # Step 4: Calculate image statistics (mean and standard deviation)
             mean, std_dev = cv2.meanStdDev(blurred)
@@ -54,47 +57,72 @@ class ImageProcessor:
             # Step 5: Set the initial brightness threshold (aggressive thresholding)
             min_brightness = 160  # More aggressive to highlight strong bright spots
             logger.info(f"Min brightness: {min_brightness}")
+
             # Step 6: Apply aggressive threshold to get an initial bright spot mask
             _, thresh = cv2.threshold(blurred, min_brightness, 255, cv2.THRESH_BINARY)
             ImageProcessor.show_image(thresh, "Initial Threshold")
+
+            # Step 7: Perform iterative erosion until we have at least `max_spots` distinct components
             erosion_history = []
             kernel_size = 11
-            current_thresh = thresh.copy()
+            num_labels, _, _, _ = cv2.connectedComponentsWithStats(thresh, connectivity=8)
 
-            while np.any(current_thresh > 0):  # Stop if all spots are removed or kernel size is too large
+            logger.info(f"num labels {num_labels}")
+            erosion_history.append(thresh)
+
+            while num_labels < max_spots and num_labels > 1 and kernel_size < thresh.shape[0]-10:  # Continue until we have at least `max_spots` distinct components
                 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
+                logger.debug("debug 1")
                 eroded = cv2.erode(thresh, kernel, iterations=1)
-                ImageProcessor.show_image(eroded)
-                erosion_history.append((kernel_size, eroded))  # Store the erosion result
-                current_thresh = eroded
-                kernel_size += 10  # Increase kernel size aggressively
+                logger.debug("debug 2")
+                erosion_history.append(eroded)  # Store the erosion result
+                logger.debug("debug 3")
+                # ImageProcessor.show_image(eroded, f"Eroded with Kernel Size: {kernel_size}")
+                
+                # Count the number of distinct connected components
+                num_labels, _, _, _ = cv2.connectedComponentsWithStats(eroded, connectivity=8)
+                logger.info(f"Number of components with kernel size {kernel_size}: {num_labels - 1}")  # Exclude the background
+                
+                if num_labels >= max_spots:  # If we have at least `max_spots` bright spots
+                    break
 
-            best_kernel_size, best_thresh = erosion_history[-20] if len(erosion_history) > 20 else erosion_history[0]
-            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (best_kernel_size, best_kernel_size))
+                kernel_size += 8  # Increase kernel size aggressively
+
+            # Step 8: Select the last valid erosion state where we had `max_spots` components
+            best_thresh = erosion_history[-2] if len(erosion_history) > 1 else thresh
+
+            # Step 9: Refine the selected erosion state with slight dilation to recover shape
             ImageProcessor.show_image(best_thresh, "Refined Threshold")
-            # Step 9: Use OpenCV's connected components to label the thresholded image
+
+            # Step 10: Use OpenCV's connected components to label the thresholded image
             num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(best_thresh, connectivity=8, ltype=cv2.CV_32S)
 
-            # Step 10: Filter components based on area and collect component centers
+            height, width = best_thresh.shape[:2]  # Get image dimensions
+            total_area = height * width             # Calculate the total area of the image
+
+            # Calculate the threshold for 1/4 of the total area
+            quarter_area_threshold = total_area / 4
+            # Step 11: Filter components based on area and collect component centers
             components = []
             for i in range(1, num_labels):  # Start from 1 to skip the background
                 area = stats[i, cv2.CC_STAT_AREA]
-                if area >= min_area:
+                logger.info(f"Area : {area}")
+                if area >= min_area and area < quarter_area_threshold:  # Filter by area
                     # Calculate the center of the bright spot
                     cX = int(stats[i, cv2.CC_STAT_LEFT] + stats[i, cv2.CC_STAT_WIDTH] / 2)
                     cY = int(stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] / 2)
 
                     # Add the component's area and center coordinates to the list
                     components.append((area, (cX, cY)))
-
-            # Step 11: Sort the components by area in descending order and select the top `max_spots`
+            logger.info(f"List len {len(components)}")
+            # Step 12: Sort the components by area in descending order and select the top `max_spots`
             components = sorted(components, key=lambda x: x[0], reverse=True)[:max_spots]
 
         except Exception as e:
             logger.error(f"Error in bright spot detection: {e}")
             return []  # Return an empty list in case of an error
 
-        # Step 12: Extract the center coordinates of the top components
+        # Step 13: Extract the center coordinates of the top components
         centers = [center for _, center in components]
 
         return centers
@@ -194,7 +222,7 @@ class ImageProcessor:
         return edges
     
     @staticmethod
-    def gaussian_blur(image, kernel_size=(5, 5), sigma=0):
+    def gaussian_blur(image, kernel_size=5, sigma=0):
         """
         Apply Gaussian blur to the input image.
 
@@ -206,7 +234,8 @@ class ImageProcessor:
         Returns:
         - blurred_image: The image after applying Gaussian blur.
         """
-        blurred_image = cv2.GaussianBlur(image, kernel_size, sigma)
+        kernel = (kernel_size, kernel_size)
+        blurred_image = cv2.GaussianBlur(image, kernel, sigma)
         return blurred_image
     
     @staticmethod
