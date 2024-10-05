@@ -90,8 +90,8 @@ def process_input(input: TextInput):
     except Exception as e:
         return {"error": f"Failed to generate highlight points: {str(e)}"}
     
-    image_with_h = ImageProcessor.visualize_centers(final_image, highlight_points, color=(0, 255, 0))
-    ImageProcessor.show_image(image_with_h, window_name="Highlight Points")
+    # image_with_h = ImageProcessor.visualize_centers(final_image, highlight_points, color=(0, 255, 0))
+    # ImageProcessor.show_image(image_with_h, window_name="Highlight Points")
 
     def img_coord_to_gps(x, y):
         x_dal = x/1000.0
