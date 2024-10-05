@@ -25,6 +25,7 @@ def edge_detection(image, min_val=100, max_val=200):
     ""
     Identify sudden changes in pixel values.
     Behavior: Creates thin outlines highlighting boundaries.
+    WARNING!!! This creates very narrow lines, so you should gaussian_blur(with kernel>=11) and normalize after this function to make it usable.
     ""
 
 def gaussian_blur(image, kernel_size=5, sigma=0):
@@ -33,10 +34,16 @@ def gaussian_blur(image, kernel_size=5, sigma=0):
     Behavior: Blurs noise and small details to show general trends.
     ""
 
+def normalize(image):
+    ""
+    Scale pixel values to a range of 0 to 255 for further data preservation.
+    Behavior: Linearly scales image pixel values so that they span whole B/W spectrum.
+    ""
+
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution,
-    "co2": CO2 emissions, high values means high emissions
+	"light": Light pollution, low values means low pollution, high values means high pollution,
+    "co2": CO2 emissions, low values means low emissions, high values means high emissions
 }
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.

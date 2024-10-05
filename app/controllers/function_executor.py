@@ -59,6 +59,8 @@ class FunctionExecutor:
                 images[output_image_name] = self.processor.edge_detection(images[params[0]], min_val=params[1], max_val=params[2])
             elif func_name == "gaussian_blur":
                 images[output_image_name] = self.processor.gaussian_blur(images[params[0]], kernel_size=params[1], sigma=params[2])
+            elif func_name == "normalize":
+                images[output_image_name] = self.processor.normalize(images[params[0]])
 
             # ImageProcessor.show_image(images[output_image_name], "Intermediate Result")
             logger.info(f"Image dimensions: {images[output_image_name].shape}")

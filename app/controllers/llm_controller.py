@@ -1,6 +1,7 @@
 from openai import OpenAI
 
 # Set your OpenAI API key here or load it from an environment variable
+# openai_api_key = "***REMOVED***"
 openai_api_key = "***REMOVED***"
 client = OpenAI(api_key=openai_api_key)
 
@@ -22,11 +23,10 @@ def load_template(file_path: str) -> str:
 class LLMController:
     def __init__(self):
         # Load the templates from external files
-        self.model = "gpt-4o"
         self.location_based_template = load_template("location_based_template.txt")
         self.data_analysis_template = load_template("data_analysis_template.txt")
 
-    def get_response(self, assistant_prompt: str, user_prompt: str) -> str:
+    def get_response(self, assistant_prompt: str, user_prompt: str, model: str) -> str:
         """
         Sends the given prompts to GPT-4 and returns the generated response.
         
@@ -45,12 +45,16 @@ class LLMController:
 
             # Call the OpenAI API to generate a response
             response = client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=0.2,
-                max_tokens=500,
-                frequency_penalty=0.0
+                model=model,
+                messages=messages
             )
+            # response = client.chat.completions.create(
+            #     model=self.model,
+            #     messages=messages,
+            #     temperature=0.2,
+            #     max_tokens=500,
+            #     frequency_penalty=0.0
+            # )
             response_text = response.choices[0].message.content
             tokens_used = response.usage.total_tokens
 
@@ -70,7 +74,7 @@ class LLMController:
             str: The generated response.
         """
         user_prompt = f"Question: {user_question}\n"
-        response, _ = self.get_response(self.location_based_template, user_prompt)
+        response, _ = self.get_response(self.location_based_template, user_prompt, "o1-preview")
         return response
 
     def handle_data_analysis_question(self, user_question: str, reasoning: str) -> str:
@@ -85,5 +89,5 @@ class LLMController:
             str: The generated response.
         """
         combined_user_prompt = f"Question: {user_question}\n{reasoning}\n"
-        response, _ = self.get_response(self.data_analysis_template, combined_user_prompt)
+        response, _ = self.get_response(self.data_analysis_template, combined_user_prompt, "gpt-4o")
         return response
