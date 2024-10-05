@@ -1,16 +1,19 @@
 "use client";
 
 import {
+  ImageOverlay,
   LayersControl,
   MapContainer,
   Marker,
   Popup,
+  Rectangle,
   TileLayer,
   WMSTileLayer,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import { useStore } from "@/hooks/state/store";
 
 // Sentinel Hub WMS service
 // tiles generated using EPSG:3857 projection - Leaflet takes care of that
@@ -54,11 +57,12 @@ const baseMaps = {
 const overlayMaps = {
   NDVI: ndvi,
   "True Color": trueColor,
-//   "Urban Area": urbanAreas,
-//   "Sentinel-2 Cloudless Mosaic": sentinel2cloudless,
+  //   "Urban Area": urbanAreas,
+  //   "Sentinel-2 Cloudless Mosaic": sentinel2cloudless,
 };
 
 export default function Map() {
+  const { mapImages } = useStore();
   return (
     <MapContainer
       center={[56.946285, 24.105078]}
@@ -67,14 +71,26 @@ export default function Map() {
       className="w-full h-full"
     >
       {baseMaps.OpenStreetMap}
-      <LayersControl>
+      {/* <LayersControl>
         {Object.entries(overlayMaps).map((entry) => (
           <LayersControl.Overlay name={entry[0]} key={entry[0]} checked={false}>
             {entry[1]}
           </LayersControl.Overlay>
         ))}
       </LayersControl>
-
+{/*  */}
+      <LayersControl>
+        {mapImages.map((image) => (
+          <>
+            <ImageOverlay
+              url={image.url}
+              bounds={image.bounds}
+              key={image.url}
+            />
+            <Rectangle bounds={image.bounds} />
+          </>
+        ))}
+      </LayersControl>
       <Marker position={[51.505, -0.09]}>
         <Popup>
           A pretty CSS3 popup. <br /> Easily customizable.
