@@ -18,7 +18,7 @@ import { useStore } from "@/hooks/state/store";
 // Sentinel Hub WMS service
 // tiles generated using EPSG:3857 projection - Leaflet takes care of that
 const baseUrl =
-  "https://sh.dataspace.copernicus.eu/ogc/wms/df3eb751-18c3-46e9-824b-3b7de8634109";
+  `https://sh.dataspace.copernicus.eu/ogc/wms/${process.env.NEXT_PUBLIC_SENTINEL_HUB_TOKEN}`;
 
 function createWmsLayer(layerId: string) {
   const layer = (
