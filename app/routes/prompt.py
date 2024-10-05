@@ -98,7 +98,7 @@ def process_input(input: TextInput):
 
     # Step 7: Create a template user response
     template_response = f"""
-    Found {len(highlight_points)} areas of interest based on your query. Here are the coordinates of these areas: {highlight_points}.
+    Found {len(highlight_points)} areas of interest based on your query. Here are the coordinates of these areas: {highlight_points_coords}.
     Relevant datasets: {', '.join(output_json['datasets'])}.
     """
 
