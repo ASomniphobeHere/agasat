@@ -3,7 +3,6 @@ import cdsapi
 from PIL import Image
 import cfgrib
 import numpy as np
-import os
 import requests as re
 from time import time
 import io
