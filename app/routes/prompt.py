@@ -1,4 +1,4 @@
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import os
 import sys
@@ -61,7 +61,7 @@ def process_input(input: TextInput):
     try:
         output_json = json.loads(data_analysis_response)  # WARNING: Use safer parsing in real-world applications!
     except Exception as e:
-        return {"error": f"Failed to parse data analysis response: {str(e)}"}
+        raise HTTPException(status_code=500, detail=f"Failed to parse data analysis response: {str(e)}")
 
     print(output_json)
 
@@ -76,7 +76,7 @@ def process_input(input: TextInput):
         final_image = executor.execute_functions(output_json)
         color_final_image = ImageProcessor.map_grayscale_to_custom_colormap(final_image)
     except Exception as e:
-        return {"error": f"Failed to execute functions: {str(e)}"}
+        raise HTTPException(status_code=500, detail=f"Failed to execute functions: {str(e)}")
 
     # Step 5: Save the final result image to the server
     final_image_filename = f"{uuid.uuid4()}.png"
@@ -88,8 +88,8 @@ def process_input(input: TextInput):
     try:
         highlight_points = ImageProcessor.detect_bright_spots(final_image, blur_radius=(11, 11), min_area=100, max_spots=10)
     except Exception as e:
-        return {"error": f"Failed to generate highlight points: {str(e)}"}
-    
+        raise HTTPException(status_code=500, detail=f"Failed to generate highlight points: {str(e)}")
+
     # image_with_h = ImageProcessor.visualize_centers(final_image, highlight_points, color=(0, 255, 0))
     # ImageProcessor.show_image(image_with_h, window_name="Highlight Points")
 

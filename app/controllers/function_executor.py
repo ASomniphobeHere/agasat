@@ -56,9 +56,19 @@ class FunctionExecutor:
                 weight_list = params[1]
                 images[output_image_name] = self.processor.weighted_average(image_list, weight_list)
             elif func_name == "edge_detection":
-                images[output_image_name] = self.processor.edge_detection(images[params[0]], min_val=params[1], max_val=params[2])
+                if len(params) == 1:
+                    images[output_image_name] = self.processor.edge_detection(images[params[0]])  # Only the first parameter
+                elif len(params) == 2:
+                    images[output_image_name] = self.processor.edge_detection(images[params[0]], min_val=params[1])  # Only min_val
+                else:
+                    images[output_image_name] = self.processor.edge_detection(images[params[0]], min_val=params[1], max_val=params[2])
             elif func_name == "gaussian_blur":
-                images[output_image_name] = self.processor.gaussian_blur(images[params[0]], kernel_size=params[1], sigma=params[2])
+                if len(params) == 1:
+                    images[output_image_name] = self.processor.gaussian_blur(images[params[0]])  # Only the first parameter
+                elif len(params) == 2:
+                    images[output_image_name] = self.processor.gaussian_blur(images[params[0]], kernel_size=params[1])  # Only kernel_size
+                else:
+                    images[output_image_name] = self.processor.gaussian_blur(images[params[0]], kernel_size=params[1], sigma=params[2])  # Both kernel_size and sigma
             elif func_name == "normalize":
                 images[output_image_name] = self.processor.normalize(images[params[0]])
 
