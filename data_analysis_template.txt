@@ -53,7 +53,8 @@ If you pass images as parameters, instead of writing the variables as themselves
 
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution
+	"light": Light pollution, low values means low pollution,
+    "co2": CO2 emissions, high values means high emissions
 }
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
