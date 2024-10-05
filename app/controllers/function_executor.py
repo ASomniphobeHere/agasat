@@ -29,9 +29,13 @@ class FunctionExecutor:
         """
         images = {}
 
+        print("Output JSON")
+        print(output_json)
+
         # Load initial datasets into the images dictionary
         for dataset in output_json['datasets']:
-            images[dataset] = self.datasets[dataset]
+            images[dataset] = ImageProcessor.normalize(self.datasets[dataset])
+            ImageProcessor.show_image(images[dataset], "Initial Dataset Image Normalized")
 
         # Execute each function in the specified order and store the result using 'output_image'
         for function in output_json['functions']:
@@ -54,6 +58,8 @@ class FunctionExecutor:
                 images[output_image_name] = self.processor.edge_detection(images[params[0]], min_val=params[1], max_val=params[2])
             elif func_name == "gaussian_blur":
                 images[output_image_name] = self.processor.gaussian_blur(images[params[0]], kernel_size=params[1], sigma=params[2])
+
+            ImageProcessor.show_image(images[output_image_name], "Intermediate Result")
 
         # Return the final image specified in the JSON output under 'final_result'
         final_image = images[output_json['final_result']]
