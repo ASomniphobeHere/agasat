@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from imutils import contours
+import base64
 import imutils
 import matplotlib.pyplot as plt
 import os
@@ -178,6 +179,19 @@ class ImageProcessor:
         return blurred_image
     
     @staticmethod
+    def normalize(image):
+        # Ensure the input is a numpy array
+        image = np.array(image, dtype=np.float32)
+
+        # Get minimum and maximum pixel values
+        min_val = np.min(image)
+        max_val = np.max(image)
+
+        # Apply linear scaling
+        scaled_image = ((image - min_val) / (max_val - min_val) * 255).astype(np.uint8)
+        return scaled_image
+    
+    @staticmethod
     def visualize_centers(image, centers, marker_size=10, color=(0, 0, 255), thickness=2):
         """
         Visualize the centers of detected bright spots on the image.
@@ -231,6 +245,12 @@ class ImageProcessor:
         """
         cv2.imwrite(output_path, image)
         print(f"Image saved to {output_path}")
+
+    @staticmethod
+    def base64_to_image(base64_string):
+        image_arr = np.fromstring(base64.b64decode(base64_string), np.uint8)
+        image = cv2.imdecode(image_arr, cv2.IMREAD_COLOR)
+        return image
 
 
 # Example usage
