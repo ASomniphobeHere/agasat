@@ -75,7 +75,6 @@ def process_input(input: TextInput):
     try:
         final_image = executor.execute_functions(output_json)
         color_final_image = ImageProcessor.map_grayscale_to_custom_colormap(final_image)
-        ImageProcessor.show_image_with_transparency(color_final_image, window_name="Final Image")  # Display the final image
     except Exception as e:
         return {"error": f"Failed to execute functions: {str(e)}"}
 
