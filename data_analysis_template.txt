@@ -25,7 +25,7 @@ def edge_detection(image, min_val=100, max_val=200):
     Behavior: Creates thin outlines highlighting boundaries.
     ""
 
-def gaussian_blur(image, kernel_size=(5, 5), sigma=0):
+def gaussian_blur(image, kernel_size=5, sigma=0):
     ""
     Smooth the image to reduce sharp transitions.
     Behavior: Blurs noise and small details to show general trends.
@@ -51,8 +51,7 @@ If you pass images as parameters, instead of writing the variables as themselves
 
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution,
-    "co2": CO2 emissions, high values means high emissions
+	"light": Light pollution, low values means low pollution
 }
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
@@ -113,6 +112,8 @@ Answer 3:
     "final_result": "temperature_low_altitude"
 }
 ""
+
+ALWAYS PASS ALL PARAMETERS TO THE FUNCTION!!!
 
 After applying these functions we will extract n places with the highest pixel value in the final_result image, and assign them to be the answer.
 

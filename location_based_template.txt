@@ -25,7 +25,7 @@ def edge_detection(image, min_val=100, max_val=200):
     Behavior: Creates thin outlines highlighting boundaries.
     ""
 
-def gaussian_blur(image, kernel_size=(5, 5), sigma=0):
+def gaussian_blur(image, kernel_size=5, sigma=0):
     ""
     Smooth the image to reduce sharp transitions.
     Behavior: Blurs noise and small details to show general trends.
@@ -33,8 +33,7 @@ def gaussian_blur(image, kernel_size=(5, 5), sigma=0):
 
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution,
-    "co2": CO2 emissions, high values means high emissions
+	"light": Light pollution, low values means low pollution
 }
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
@@ -58,7 +57,7 @@ Route:
 3. **invert_bw_image(vegetation)**  
    - Highlight areas with minimal vegetation, to avoid disruption of green spaces.
 
-4. **gaussian_blur(elevation, kernel_size=(5, 5))**  
+4. **gaussian_blur(elevation, kernel_size=5)**  
    - Smooth elevation data to emphasize general trends of high-altitude regions.
 
 5. **multiply_masks(step 1, step 2)**  
