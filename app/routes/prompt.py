@@ -83,7 +83,7 @@ def process_input(input: TextInput):
 
     # Step 6: Generate highlight points from the final image
     try:
-        highlight_points = ImageProcessor.detect_bright_spots(final_image, blur_radius=(11, 11), min_area=300, max_spots=5)
+        highlight_points = ImageProcessor.detect_bright_spots(final_image, blur_radius=(11, 11), min_area=100, max_spots=10)
     except Exception as e:
         return {"error": f"Failed to generate highlight points: {str(e)}"}
 

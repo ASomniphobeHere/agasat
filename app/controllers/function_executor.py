@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")
 from app.controllers.image_processor import ImageProcessor
 import cv2
 import numpy as np
+from loguru import logger
 
 class FunctionExecutor:
     def __init__(self, datasets):
@@ -35,13 +36,15 @@ class FunctionExecutor:
         # Load initial datasets into the images dictionary
         for dataset in output_json['datasets']:
             images[dataset] = ImageProcessor.normalize_power(self.datasets[dataset], power=0.2)
-            ImageProcessor.show_image(images[dataset], "Initial Dataset Image Normalized")
+            images[dataset] = cv2.cvtColor(images[dataset], cv2.COLOR_BGR2GRAY)
+            # ImageProcessor.show_image(images[dataset], "Initial Dataset Image Normalized")
 
         # Execute each function in the specified order and store the result using 'output_image'
         for function in output_json['functions']:
             func_name = function['func']
             params = function['params']
             output_image_name = function['output_image']
+            logger.info(f"Function: {func_name}, {params}")
 
             # Map function names to actual methods in the ImageProcessor class
             if func_name == "multiply_masks":
@@ -57,7 +60,8 @@ class FunctionExecutor:
             elif func_name == "gaussian_blur":
                 images[output_image_name] = self.processor.gaussian_blur(images[params[0]], kernel_size=params[1], sigma=params[2])
 
-            ImageProcessor.show_image(images[output_image_name], "Intermediate Result")
+            # ImageProcessor.show_image(images[output_image_name], "Intermediate Result")
+            logger.info(f"Image dimensions: {images[output_image_name].shape}")
 
         # Return the final image specified in the JSON output under 'final_result'
         final_image = images[output_json['final_result']]
