@@ -1,0 +1,5 @@
+cdsapi
+pillow
+cfgrib
+numpy
+requests
