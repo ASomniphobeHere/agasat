@@ -55,6 +55,7 @@ Output JSON format as a pure string, don't include the bounding quotation marks:
 	],
 	"final_result": variable name of the resulting image
 }
+ALWAYS PROVIDE ALL THREE KEYS, EVEN IF NO FUNCTIONS ARE BEING PERFORMED
 the output_image can be used as a variable in later functions, after it has been defined
 If you pass images as parameters, instead of writing the variables as themselves, write their names as strings
 
