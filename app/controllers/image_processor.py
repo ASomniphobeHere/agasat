@@ -60,7 +60,7 @@ class ImageProcessor:
 
             # Step 6: Apply aggressive threshold to get an initial bright spot mask
             _, thresh = cv2.threshold(blurred, min_brightness, 255, cv2.THRESH_BINARY)
-            ImageProcessor.show_image(thresh, "Initial Threshold")
+            # ImageProcessor.show_image(thresh, "Initial Threshold")
 
             # Step 7: Perform iterative erosion until we have at least `max_spots` distinct components
             erosion_history = []
@@ -92,7 +92,7 @@ class ImageProcessor:
             best_thresh = erosion_history[-2] if len(erosion_history) > 1 else thresh
 
             # Step 9: Refine the selected erosion state with slight dilation to recover shape
-            ImageProcessor.show_image(best_thresh, "Refined Threshold")
+            # ImageProcessor.show_image(best_thresh, "Refined Threshold")
 
             # Step 10: Use OpenCV's connected components to label the thresholded image
             num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(best_thresh, connectivity=8, ltype=cv2.CV_32S)

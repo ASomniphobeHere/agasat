@@ -65,8 +65,8 @@ def process_input(input: TextInput):
 
     # Step 3: Retrieve the required datasets based on the output_json
     datasets = get_datasets(output_json["datasets"], input.coordinates)
-    for key, value in datasets.items():
-        ImageProcessor.show_image(value, window_name=key)  # Display the dataset images
+    # for key, value in datasets.items():
+    #     ImageProcessor.show_image(value, window_name=key)  # Display the dataset images
 
     # Step 4: Initialize the FunctionExecutor and run the sequence of functions
     executor = FunctionExecutor(datasets)
@@ -132,5 +132,5 @@ if __name__ == "__main__":
     image_processor = ImageProcessor()
     list_names = ["base_image", "another_image"]
     base_image = get_datasets(list_names)
-    for n in list_names:
-        image_processor.show_image(base_image[n], window_name=n)
+    # for n in list_names:
+    #     image_processor.show_image(base_image[n], window_name=n)

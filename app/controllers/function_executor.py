@@ -165,9 +165,9 @@ if __name__ == "__main__":
     
     executor = FunctionExecutor(datasets)
     final_image = executor.execute_functions(output_json)
-    executor.processor.show_image(base_image)
-    executor.processor.show_image(light_pollution_image)
-    executor.processor.show_image(co2_emission_image)
+    # executor.processor.show_image(base_image)
+    # executor.processor.show_image(light_pollution_image)
+    # executor.processor.show_image(co2_emission_image)
     
     # Display the resulting image
     cv2.imshow("Final Image", final_image)
