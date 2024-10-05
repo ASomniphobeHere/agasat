@@ -10,6 +10,7 @@ from data_api.data_get import Data_get
 from fastapi.responses import FileResponse
 from typing import List, Tuple
 from PIL import Image
+from loguru import logger
 import os
 import uuid
 import random
@@ -49,6 +50,7 @@ def process_input(input: TextInput):
     """
     Processes the input text and coordinates, creates images, and returns a response with the final results.
     """
+    logger.debug(f"Received input: {input.text}, coordinates: {input.coordinates}")
     # Step 1: Use location-based template to get relevant datasets and reasoning
     location_response = llm_controller.handle_location_based_question(input.text)
     print(location_response)
