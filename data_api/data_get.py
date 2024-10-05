@@ -85,6 +85,5 @@ class Data_get:
         return self.__file_to_b64(maped)
 
         
-data_get = Data_get(54, 19, 55, 18)
-stringdata = data_get.get("co2")
-print(stringdata)
+# data_get = Data_get(54, 19, 55, 18)
+# stringdata = data_get.get("co2") -> returns base64 encoded string
