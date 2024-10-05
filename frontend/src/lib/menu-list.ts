@@ -6,7 +6,8 @@ import {
   SquarePen,
   LayoutGrid,
   LucideIcon,
-  AlignHorizontalSpaceBetweenIcon
+  AlignHorizontalSpaceBetweenIcon,
+  Map
 } from "lucide-react";
 
 type Submenu = {
@@ -37,7 +38,7 @@ export function getMenuList(pathname: string): Group[] {
           href: "/",
           label: "Map",
           active: pathname.includes("/"),
-          icon: LayoutGrid,
+          icon: Map,
           submenus: []
         }
       ]

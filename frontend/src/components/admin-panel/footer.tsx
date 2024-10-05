@@ -4,7 +4,7 @@ export function Footer() {
       <div className="mx-4 md:mx-8 flex h-14 items-center">
         <p className="text-xs md:text-sm leading-loose text-muted-foreground text-left">
 
-        UrbanOrbit - built for Cassini Hackathon 2024 by team AiSat
+        AGAGIS - built for Baltic AI Hack 2024 by hakatonchiki
         </p>
       </div>
     </div>

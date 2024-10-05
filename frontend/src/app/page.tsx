@@ -1,24 +1,28 @@
 import { Metadata } from "next";
-import { useMemo } from "react";
-import dynamic from "next/dynamic";
+import ChatComponent from "@/components/Chat";
+import LazyMap from "@/components/LazyMap";
+// import Map from "@/components/Map";
 
 export const metadata: Metadata = {
-  title: "Map",
+  title: "IDEA",
 };
 
-export default function Home() {
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("../components/Map"), {
-        loading: () => <p>A map is loading</p>,
-        ssr: false,
-      }),
-    []
-  );
+// const Map = dynamic(() => import("../components/Map"), {
+//   loading: () => <p>A map is loading</p>,
+//   ssr: false,
+// });
 
+export default function Home() {
   return (
-    <div className="w-[80vw] h-[100vh]">
-      <Map />
+    <div className="flex">
+      <div className="w-[50rem]">
+        <ChatComponent />
+      </div>
+      <div className="w-[80vw] h-[100vh]">
+        <LazyMap />
+      </div>
     </div>
   );
 }
+
+// export const dynamic = ""
