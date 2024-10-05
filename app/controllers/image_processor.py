@@ -6,67 +6,97 @@ import imutils
 import matplotlib.pyplot as plt
 import os
 import sys
+from loguru import logger
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from app.utils.synthetic_data import SyntheticDataGenerator
 
 class ImageProcessor:
+
     @staticmethod
-    def detect_bright_spots(image, blur_radius=(11, 11), min_area=300, max_spots=5):
+    def detect_bright_spots(image, blur_radius=(11, 11), min_area=300, max_spots=5, initial_brightness_factor=1.5, step_factor=0.1):
         """
         Detect and return the centers of the top bright spots in the given image, sorted by area.
 
         Parameters:
         - image: A pre-loaded OpenCV image object (numpy array).
         - blur_radius: Kernel size for the Gaussian blur.
-        - min_brightness: Minimum brightness threshold to consider a region as a bright spot.
         - min_area: Minimum area (in pixels) for a region to be considered a bright spot.
         - max_spots: Maximum number of bright spots to return, sorted by area.
+        - initial_brightness_factor: Initial multiplier for setting the brightness threshold based on image statistics.
+        - step_factor: Factor by which to decrease the threshold in each iteration if not enough bright spots are found.
 
         Returns:
         - centers: A list of tuples representing the (x, y) coordinates of the centers of the bright spots.
         """
 
-        # Step 1: Apply Gaussian blur to the grayscale image
-        blurred = cv2.GaussianBlur(image, blur_radius, 0)
+        try:
+            # Step 1: Validate input image
+            if image is None or not isinstance(image, np.ndarray) or image.size == 0:
+                logger.error("Invalid image: Input image is either None, not a numpy array, or empty.")
+                return []
 
-        # 85% of the maximum image pixel value
-        min_brightness = 0.85 * cv2.minMaxLoc(blurred)[1]
+            # Step 2: Ensure the image is in single-channel grayscale format
+            if len(image.shape) == 3 and image.shape[2] == 3:  # Check if the image is in BGR format
+                logger.info("Converting BGR image to grayscale.")
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            elif len(image.shape) != 2:  # If it's not single-channel or not a standard grayscale image
+                logger.error("Invalid image format: Expected a single-channel grayscale image.")
+                return []
 
-        # Step 2: Threshold the blurred image to reveal light regions
-        _, thresh = cv2.threshold(blurred, min_brightness, 255, cv2.THRESH_BINARY)
+            # Step 3: Apply Gaussian blur to the grayscale image to smooth out noise
+            blurred = cv2.GaussianBlur(image, blur_radius, 0)
 
-        # Step 3: Perform a series of erosions and dilations to remove small blobs of noise
-        thresh = cv2.erode(thresh, None, iterations=2)
-        thresh = cv2.dilate(thresh, None, iterations=4)
+            # Step 4: Calculate image statistics (mean and standard deviation)
+            mean, std_dev = cv2.meanStdDev(blurred)
+            mean = mean[0][0]
+            std_dev = std_dev[0][0]
 
-        # Step 4: Use OpenCV's connected components to label the thresholded image
-        num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(thresh, connectivity=8, ltype=cv2.CV_32S)
+            # Step 5: Set the initial brightness threshold (aggressive thresholding)
+            min_brightness = 200  # More aggressive to highlight strong bright spots
+            logger.info(f"Min brightness: {min_brightness}")
+            # Step 6: Apply aggressive threshold to get an initial bright spot mask
+            _, thresh = cv2.threshold(blurred, min_brightness, 255, cv2.THRESH_BINARY)
+            ImageProcessor.
+            erosion_history = []
+            kernel_size = 11
+            current_thresh = thresh.copy()
 
-        # Step 5: Create a mask for large components only and collect component areas and centers
-        components = []  # List to hold (area, (center_x, center_y)) tuples
-        mask = np.zeros(thresh.shape, dtype="uint8")
+            while np.any(current_thresh > 0):  # Stop if all spots are removed or kernel size is too large
+                kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
+                eroded = cv2.erode(thresh, kernel, iterations=1)
+                erosion_history.append((kernel_size, eroded))  # Store the erosion result
+                current_thresh = eroded
+                kernel_size += 10  # Increase kernel size aggressively
 
-        for i in range(1, num_labels):  # Start from 1 to skip the background
-            area = stats[i, cv2.CC_STAT_AREA]
-            if area >= min_area:
-                component_mask = (labels == i).astype("uint8") * 255
-                mask = cv2.add(mask, component_mask)
+            best_kernel_size, best_thresh = erosion_history[-20] if len(erosion_history) > 20 else erosion_history[0]
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (best_kernel_size, best_kernel_size))
+            ImageProcessor.show_image(best_thresh, "Refined Threshold")
+            # Step 9: Use OpenCV's connected components to label the thresholded image
+            num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(best_thresh, connectivity=8, ltype=cv2.CV_32S)
 
-                # Calculate the center of the bright spot
-                cX = int(stats[i, cv2.CC_STAT_LEFT] + stats[i, cv2.CC_STAT_WIDTH] / 2)
-                cY = int(stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] / 2)
+            # Step 10: Filter components based on area and collect component centers
+            components = []
+            for i in range(1, num_labels):  # Start from 1 to skip the background
+                area = stats[i, cv2.CC_STAT_AREA]
+                if area >= min_area:
+                    # Calculate the center of the bright spot
+                    cX = int(stats[i, cv2.CC_STAT_LEFT] + stats[i, cv2.CC_STAT_WIDTH] / 2)
+                    cY = int(stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] / 2)
 
-                # Add the component's area and center coordinates to the list
-                components.append((area, (cX, cY)))
+                    # Add the component's area and center coordinates to the list
+                    components.append((area, (cX, cY)))
 
-        # Step 6: Sort the components by area in descending order and select the top `max_spots`
-        components = sorted(components, key=lambda x: x[0], reverse=True)[:max_spots]
+            # Step 11: Sort the components by area in descending order and select the top `max_spots`
+            components = sorted(components, key=lambda x: x[0], reverse=True)[:max_spots]
 
-        # Step 7: Extract the center coordinates of the top components
+        except Exception as e:
+            logger.error(f"Error in bright spot detection: {e}")
+            return []  # Return an empty list in case of an error
+
+        # Step 12: Extract the center coordinates of the top components
         centers = [center for _, center in components]
 
         return centers
-
     
     @staticmethod
     def multiply_masks(image1, image2):
@@ -190,6 +220,36 @@ class ImageProcessor:
         # Apply linear scaling
         scaled_image = ((image - min_val) / (max_val - min_val) * 255).astype(np.uint8)
         return scaled_image
+    
+    @staticmethod
+    def normalize_power(image, power=0.5):
+        """
+        Normalize the input image using square root transformation.
+
+        Parameters:
+        - image: Input image as a numpy array (any dtype).
+
+        Returns:
+        - Transformed image with pixel values scaled to 0-255 using sqrt transformation.
+        """
+
+        # Ensure the input is a numpy array and convert to float32 for calculations
+        image = np.array(image, dtype=np.float32)
+
+        # Get minimum and maximum pixel values for normalization
+        min_val = np.min(image)
+        max_val = np.max(image)
+
+        # Normalize image to the range [0, 1]
+        normalized_image = (image - min_val) / (max_val - min_val + 1e-5)  # Adding a small value to prevent division by zero
+
+        # Apply square root transformation
+        sqrt_image = np.power(normalized_image, power)
+
+        # Scale back to [0, 255]
+        scaled_sqrt_image = (sqrt_image * 255).astype(np.uint8)
+
+        return scaled_sqrt_image
     
     @staticmethod
     def visualize_centers(image, centers, marker_size=10, color=(0, 0, 255), thickness=2):

@@ -22,7 +22,7 @@ def load_template(file_path: str) -> str:
 class LLMController:
     def __init__(self):
         # Load the templates from external files
-        self.model = "gpt-4o-mini"
+        self.model = "gpt-4o"
         self.location_based_template = load_template("location_based_template.txt")
         self.data_analysis_template = load_template("data_analysis_template.txt")
 
