@@ -17,6 +17,8 @@ interface Store {
     setMapImages: (state: MapImage[]) => void
     markers: Markers[]
     setMarkers: (state: Markers[]) => void
+    bounds?: LatLngBoundsExpression
+    setBounds: (state: LatLngBoundsExpression) => void
 }
 
 export const useStore = create<Store>((set) => ({
@@ -24,4 +26,6 @@ export const useStore = create<Store>((set) => ({
   setMapImages: (newImages: MapImage[]) => set((oldState) => ({ ...oldState, mapImages: newImages })),
   markers: [],
   setMarkers: (newMarkers: Markers[]) => set((oldState) => ({ ...oldState, markers: newMarkers })),
+  bounds: undefined,
+  setBounds: (newBounds: LatLngBoundsExpression) => set((oldState) => ({ ...oldState, bounds: newBounds })),
 }));

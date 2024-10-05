@@ -24,6 +24,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeDisplayBlock from "@/components/code-display-block";
 import { useStore } from "@/hooks/state/store";
+import { convertLatLngBoundsToNWSE } from "@/utils/convertCoords";
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -59,6 +60,21 @@ const useChat = () => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setIsLoading(true);
+
+    const bounds = useStore.getState().bounds;
+    if (!bounds) {
+      setIsLoading(false);
+      return;
+    }
+
+    fetch("http://localhost:8000/prompt", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ bounds: convertLatLngBoundsToNWSE(bounds), message: input }),
+    });
+
     // Add your backend integration here
     setMessages((prev) => [...prev, { role: "user", content: input }]);
     setInput("");
