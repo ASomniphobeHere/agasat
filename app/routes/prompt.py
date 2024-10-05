@@ -15,6 +15,7 @@ import uuid
 import random
 import numpy as np
 import cv2
+import json
 
 # Set up the main app and router
 app = FastAPI()
@@ -53,10 +54,10 @@ def process_input(input: TextInput):
     print(location_response)
     # Step 2: Use the data analysis template to get processing functions and their order
     data_analysis_response = llm_controller.handle_data_analysis_question(input.text, location_response)
-    
+    print(data_analysis_response)
     # Parse the data_analysis_response into a JSON-like format (mocking here for example purposes)
     try:
-        output_json = eval(data_analysis_response)  # WARNING: Use safer parsing in real-world applications!
+        output_json = json.loads(data_analysis_response)  # WARNING: Use safer parsing in real-world applications!
     except Exception as e:
         return {"error": f"Failed to parse data analysis response: {str(e)}"}
 
@@ -88,8 +89,8 @@ def process_input(input: TextInput):
 
     # Step 7: Create a template user response
     template_response = f"""
-    Based on the provided analysis, the following datasets were found to be relevant: {', '.join(output_json['datasets'])}.
-    The resulting image has been saved and contains the specified high-value points.
+    Found {len(highlight_points)} areas of interest based on your query. Here are the coordinates of these areas: {highlight_points}.
+    Relevant datasets: {', '.join(output_json['datasets'])}.
     """
 
     # Return the response with relevant details
