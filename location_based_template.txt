@@ -19,12 +19,6 @@ def weighted_average(image_list, weight_list):
     Behavior: Blends images, emphasizing regions based on weights. Weights should sum to 1.
     ""
 
-def pixel_threshold(image, threshold_value=128):
-    ""
-    Mark regions that surpass a set intensity.
-    Behavior: Pixels above the threshold turn white; others darken.
-    ""
-
 def edge_detection(image, min_val=100, max_val=200):
     ""
     Identify sudden changes in pixel values.
@@ -39,13 +33,15 @@ def gaussian_blur(image, kernel_size=(5, 5), sigma=0):
 
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution
+	"light": Light pollution, low values means low pollution,
+    "co2": CO2 emissions, high values means high emissions
 }
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
 Try to make the model as simple as possible(use the least number of datasets) while also actually taking all the highly relevant datasets.
 
-Give list of Relevant datasets, Best Location Qualities and a route to get that with applying functions. You should comment succinctly what you get after each function, what meaning it has.
+Give list of Relevant datasets, Best Location Qualities and a route to get that with applying functions. You should comment succinctly what you get after each function, what meaning it has. Try to do as little functions as possible, only use more functions if ABSOLUTELY NECESSARY.
+REMEMBER THIS: if you can do it without a function, you ABSOLUTELY should
 example
 Question: Where is the best location for a new wind farm?
 Answer:

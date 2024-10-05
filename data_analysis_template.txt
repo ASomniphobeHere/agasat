@@ -19,13 +19,6 @@ def weighted_average(image_list, weight_list):
     Behavior: Blends images, emphasizing regions based on weights. Weights should sum to 1.
     ""
 
-def pixel_threshold(image, threshold_value=200):
-    ""
-    Mark regions that surpass a set intensity.
-    Behavior: Pixels with values above the threshold turn white; others darken.
-    Basically takes the places to extremes, with default only the whitest areas remain
-    ""
-
 def edge_detection(image, min_val=100, max_val=200):
     ""
     Identify sudden changes in pixel values.
@@ -39,7 +32,7 @@ def gaussian_blur(image, kernel_size=(5, 5), sigma=0):
     ""
 
 
-Output JSON format:
+Output JSON format as a pure string, don't include the bounding quotation marks:
 {
 	"datasets": ["light", ...(other dataset names)],
 	"functions": [
@@ -58,7 +51,8 @@ If you pass images as parameters, instead of writing the variables as themselves
 
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution
+	"light": Light pollution, low values means low pollution,
+    "co2": CO2 emissions, high values means high emissions
 }
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
@@ -67,6 +61,7 @@ examples of output
 Question 1:
 "Where are the regions with the highest combination of light pollution and CO2 emissions?"
 Answer 1:
+""
 {
     "datasets": ["light", "co2"],
     "functions": [
@@ -78,10 +73,12 @@ Answer 1:
     ],
     "final_result": "combined_light_co2"
 }
+""
 
 Question 2:
 "Which regions have the highest rainfall intensity with a high level of vegetation?"
 Answer 2:
+""
 {
     "datasets": ["precipitation", "vegetation"],
     "functions": [
@@ -93,9 +90,12 @@ Answer 2:
     ],
     "final_result": "high_rainfall_vegetation"
 }
+""
+
 Question 3:
 "Show areas with significant temperature variations along regions of low altitude."
 Answer 3:
+""
 {
     "datasets": ["temperature", "elevation"],
     "functions": [
@@ -112,6 +112,7 @@ Answer 3:
     ],
     "final_result": "temperature_low_altitude"
 }
+""
 
 After applying these functions we will extract n places with the highest pixel value in the final_result image, and assign them to be the answer.
 

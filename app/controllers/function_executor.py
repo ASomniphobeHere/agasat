@@ -34,7 +34,7 @@ class FunctionExecutor:
 
         # Load initial datasets into the images dictionary
         for dataset in output_json['datasets']:
-            images[dataset] = ImageProcessor.normalize(self.datasets[dataset])
+            images[dataset] = ImageProcessor.normalize_power(self.datasets[dataset], power=0.2)
             ImageProcessor.show_image(images[dataset], "Initial Dataset Image Normalized")
 
         # Execute each function in the specified order and store the result using 'output_image'
@@ -52,8 +52,6 @@ class FunctionExecutor:
                 image_list = [images[param] for param in params[0]]
                 weight_list = params[1]
                 images[output_image_name] = self.processor.weighted_average(image_list, weight_list)
-            elif func_name == "pixel_threshold":
-                images[output_image_name] = self.processor.pixel_threshold(images[params[0]], threshold_value=params[1] if len(params) > 1 else 128)
             elif func_name == "edge_detection":
                 images[output_image_name] = self.processor.edge_detection(images[params[0]], min_val=params[1], max_val=params[2])
             elif func_name == "gaussian_blur":
