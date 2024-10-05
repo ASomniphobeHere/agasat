@@ -3,3 +3,4 @@ pillow
 cfgrib
 numpy
 requests
+xarray
