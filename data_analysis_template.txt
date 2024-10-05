@@ -13,6 +13,7 @@ def invert_bw_image(image):
     ""
     Reverse values to emphasize regions with initially low values.
     Behavior: Black areas turn white and vice versa, revealing low-value patterns.
+    IF YOU WANT TO HIGHLIGH HIGH VALUE REGIONS, DON'T USE THIS FUNCTION. IT WILL DO THE OPPOSITE.
     ""
 
 def weighted_average(image_list, weight_list):
@@ -70,7 +71,6 @@ examples of output
 Question 1:
 "Where are the regions with the highest combination of light pollution and CO2 emissions?"
 Answer 1:
-""
 {
     "datasets": ["light", "co2"],
     "functions": [
@@ -82,12 +82,10 @@ Answer 1:
     ],
     "final_result": "combined_light_co2"
 }
-""
 
 Question 2:
 "Which regions have the highest rainfall intensity with a high level of vegetation?"
 Answer 2:
-""
 {
     "datasets": ["precipitation", "vegetation"],
     "functions": [
@@ -99,12 +97,10 @@ Answer 2:
     ],
     "final_result": "high_rainfall_vegetation"
 }
-""
 
 Question 3:
 "Show areas with significant temperature variations along regions of low altitude."
 Answer 3:
-""
 {
     "datasets": ["temperature", "elevation"],
     "functions": [
@@ -121,7 +117,6 @@ Answer 3:
     ],
     "final_result": "temperature_low_altitude"
 }
-""
 
 ALWAYS PASS ALL PARAMETERS TO THE FUNCTION!!!
 

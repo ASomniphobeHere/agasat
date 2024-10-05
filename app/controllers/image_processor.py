@@ -142,11 +142,11 @@ class ImageProcessor:
         if custom_colors is None:
             # Define a custom red-yellow-green color spectrum (colormap) with an RGBA format.
             custom_colors = np.array([
-                [0, 0, 255, 255],      # Red (opaque)
-                [0, 128, 255, 255],    # Orange (opaque)
-                [0, 255, 255, 255],    # Yellow (opaque)
-                [0, 255, 128, 128],    # Light Green (semi-transparent)
-                [0, 255, 0, 64],        # Green (fully transparent)
+                [255, 0, 0, 0],        # Green (fully transparent)
+                [255, 0, 128, 64],    # Light Green (semi-transparent)
+                [255, 0, 255, 64],    # Yellow (opaque)
+                [128, 0, 255, 64],    # Orange (opaque)
+                [0, 0, 255, 64],      # Red (opaque)
             ], dtype=np.uint8)
         
         # Normalize grayscale image values to the range of [0, len(custom_colors)-1]

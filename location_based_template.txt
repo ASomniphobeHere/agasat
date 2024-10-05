@@ -13,6 +13,7 @@ def invert_bw_image(image):
     ""
     Reverse values to emphasize regions with initially low values.
     Behavior: Black areas turn white and vice versa, revealing low-value patterns.
+    IF YOU WANT TO HIGHLIGH HIGH VALUE REGIONS, DON'T USE THIS FUNCTION. IT WILL DO THE OPPOSITE.
     ""
 
 def weighted_average(image_list, weight_list):

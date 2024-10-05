@@ -93,8 +93,8 @@ def process_input(input: TextInput):
     def img_coord_to_gps(x, y):
         x_dal = x/1000.0
         y_dal = y/1000.0
-        x_gps = input.coordinates[0] + x_dal*(input.coordinates[2] - input.coordinates[0])
-        y_gps = input.coordinates[1] + y_dal*(input.coordinates[3] - input.coordinates[1])
+        y_gps = input.coordinates[0] + y_dal*(input.coordinates[2] - input.coordinates[0])
+        x_gps = input.coordinates[1] + x_dal*(input.coordinates[3] - input.coordinates[1])
         return (x_gps, y_gps)
 
     highlight_points_coords = [img_coord_to_gps(x, y) for x, y in highlight_points]
