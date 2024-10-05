@@ -52,11 +52,11 @@ class ImageProcessor:
             std_dev = std_dev[0][0]
 
             # Step 5: Set the initial brightness threshold (aggressive thresholding)
-            min_brightness = 200  # More aggressive to highlight strong bright spots
+            min_brightness = 160  # More aggressive to highlight strong bright spots
             logger.info(f"Min brightness: {min_brightness}")
             # Step 6: Apply aggressive threshold to get an initial bright spot mask
             _, thresh = cv2.threshold(blurred, min_brightness, 255, cv2.THRESH_BINARY)
-            ImageProcessor.
+            ImageProcessor.show_image(thresh, "Initial Threshold")
             erosion_history = []
             kernel_size = 11
             current_thresh = thresh.copy()
@@ -64,6 +64,7 @@ class ImageProcessor:
             while np.any(current_thresh > 0):  # Stop if all spots are removed or kernel size is too large
                 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (kernel_size, kernel_size))
                 eroded = cv2.erode(thresh, kernel, iterations=1)
+                ImageProcessor.show_image(eroded)
                 erosion_history.append((kernel_size, eroded))  # Store the erosion result
                 current_thresh = eroded
                 kernel_size += 10  # Increase kernel size aggressively
