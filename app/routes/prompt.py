@@ -72,6 +72,7 @@ def process_input(input: TextInput):
         # for key, value in datasets.items():
         #     ImageProcessor.show_image(value, window_name=key)  # Display the dataset images
     except Exception as e:
+        logger.exception(e)
         raise HTTPException(status_code=400, detail=f"Bad input data(maybe too large tile for light): {str(e)}")
     all_datasets = output_json["datasets"].copy()
     all_datasets.extend(output_json["datasets_missing"])

@@ -66,7 +66,7 @@ These are the datasets that are available:
 	"light": has available data, Light pollution, low values means low pollution, high values means high pollution,
     "co2": has available data, CO2 emissions, low values means low emissions, high values means high emissions,
     "elevation", doesnt have available data, elevation, low values means low elevation, high values means high elevation,
-    "hospital_proximity", doesnt have available data, measures how far away is the nearest hospital, high values means there is a hospital nearby, low values means there is no hospital nearby
+    "health", has available data, measures hospital proximity, high values means there is a hospital nearby, low values means there is no hospital nearby
 }
 If a dataset doesnt have available data, only include it in the output json key "datasets_missing", nothing else
 

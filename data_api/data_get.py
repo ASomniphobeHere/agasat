@@ -90,7 +90,7 @@ class Data_get:
         return self.__file_to_b64(maped)
     
     def __get_health(self) -> str:
-        with open("dataset_api/data.json", "r") as file:
+        with open("data_api/data.json", "r") as file:
             data = json.load(file)
         
         
