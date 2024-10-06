@@ -109,7 +109,7 @@ def process_input(input: TextInput):
     highlight_points_coords = [img_coord_to_gps(x, y) for x, y in highlight_points]
 
     # Step 7: Create a template user response
-    response = location_response.split("Route:")[0]
+    response = location_response
     response = re.sub("\n+", "\n", response)  # Remove extra newlines
     response = re.sub("\*\*", "", response)  # Remove bold formatting
     response = re.sub("\\\"", "", response)
