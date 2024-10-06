@@ -8,8 +8,8 @@ interface MapImage {
 
 interface Markers {
     coords: LatLngExpression
-    label: string
-    description: string
+    label?: string
+    description?: string
 }
 
 interface Store {

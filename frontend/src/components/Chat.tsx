@@ -19,12 +19,13 @@ import {
   Volume2,
 } from "lucide-react";
 import { SetStateAction, useEffect, useRef, useState } from "react";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+// import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeDisplayBlock from "@/components/code-display-block";
 import { useStore } from "@/hooks/state/store";
 import { convertLatLngBoundsToNWSE } from "@/utils/convertCoords";
+// import { LatLngBoundsExpression } from "leaflet";
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -49,7 +50,7 @@ const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { setMapImages } = useStore();
+  const { setMapImages, setMarkers } = useStore();
 
   const handleInputChange = (e: {
     target: { value: SetStateAction<string> };
@@ -61,26 +62,47 @@ const useChat = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    
+
+    // Add your backend integration here
+    setMessages((prev) => [...prev, { role: "user", content: input }]);
+    setInput("");
     const bounds = useStore.getState().bounds;
     if (!bounds) {
       setIsLoading(false);
       return;
     }
 
-    fetch("http://localhost:8000/prompt", {
+    const coords = convertLatLngBoundsToNWSE(bounds);
+    const coordsarray = [coords[0][0], coords[0][1], coords[1][0], coords[1][1]];
+
+    // console.log("dirsā")
+    const res = await fetch("http://localhost:8000/prompt/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ bounds: convertLatLngBoundsToNWSE(bounds), message: input }),
+      body: JSON.stringify({ coordinates: coordsarray, text: input }),
     });
 
-    // Add your backend integration here
-    setMessages((prev) => [...prev, { role: "user", content: input }]);
-    setInput("");
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setMessages((prev) => [...prev, { role: 'assistant', content: "Sveiks... 🥺👉👈"}]);
-    setMapImages([{ url: "https://www.frontierfireprotection.com/wp-content/uploads/freshizer/730cbf2e2455c64c961be8e18e793f6b_3-Things-a-Fire-Needs-2000-c-90.jpg", bounds: [[57.08, 24.934], [56.90, 25.27]] }]);
+    if (!res.ok) {
+      setIsLoading(false);
+      setMessages((prev) => [...prev, { role: 'assistant', content: "Error"}]);
+      return;
+    }
+
+    const data = await res.json();
+
+    console.log(data);
+
+    // const markercoords = data.highlight_points.map((point: [number, number]) => convertNWSEToLatLngBounds(point));
+
+    const markers = data.highlight_points.map((coords: [number, number]) => ({coords: coords}));
+
+    setMessages((prev) => [...prev, { role: 'assistant', content: data.response}]);
+    setMapImages([{ url: `http://localhost:8000${data.final_image_url}`, bounds: bounds }]);
+    setMarkers(markers);
+
     setIsLoading(false);
   };
 
@@ -274,7 +296,7 @@ export default function ChatComponent() {
           </div>
         </form>
       </div>
-      <div className="pt-4 flex gap-2 items-center">
+      {/* <div className="pt-4 flex gap-2 items-center">
         <GitHubLogoIcon className="size-4" />
         <p className="text-xs">
           <a
@@ -296,7 +318,7 @@ export default function ChatComponent() {
             </svg>
           </a>
         </p>
-      </div>
+      </div> */}
     </main>
   );
 }

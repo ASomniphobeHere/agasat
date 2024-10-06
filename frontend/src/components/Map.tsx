@@ -24,7 +24,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { Map } from "leaflet";
+import { Icon, type Map } from "leaflet";
 
 // Sentinel Hub WMS service
 // tiles generated using EPSG:3857 projection - Leaflet takes care of that
@@ -60,8 +60,24 @@ const osm = (
   />
 );
 
+const stadiaDark = (
+  <TileLayer
+    attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+  />
+);
+
+const stadiaOrthoPhoto = (
+  <TileLayer
+    attribution='&copy; CNES, Distribution Airbus DS, © Airbus DS, © PlanetObserver (Contains Copernicus Data) | &copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    url="https://tiles.stadiamaps.com/tiles/alidade_satellite/{z}/{x}/{y}{r}.jpg"
+  />
+);
+
 const baseMaps = {
   OpenStreetMap: osm,
+  StadiaDark: stadiaDark,
+  StadiaOrthoPhoto: stadiaOrthoPhoto,
 };
 
 const overlayMaps = {
@@ -71,21 +87,27 @@ const overlayMaps = {
   //   "Sentinel-2 Cloudless Mosaic": sentinel2cloudless,
 };
 
+const customIcon = new Icon.Default({
+  iconSize: [30, 45],
+  iconAnchor: [10, 41],
+  
+  iconUrl: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLW1hcC1waW4iPjxwYXRoIGQ9Ik0yMCAxMGMwIDQuOTkzLTUuNTM5IDEwLjE5My03LjM5OSAxMS43OTlhMSAxIDAgMCAxLTEuMjAyIDBDOS41MzkgMjAuMTkzIDQgMTQuOTkzIDQgMTBhOCA4IDAgMCAxIDE2IDAiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEwIiByPSIzIi8+PC9zdmc+",
+});
 
 
 export default function MapComponent() {
-  const { mapImages } = useStore();
+  const { mapImages, markers } = useStore();
 
   const [map, setMap] = useState<Map | null>(null);
 
-  const { bounds, setBounds } = useStore();
+  const { setBounds } = useStore();
 
   const onMove = useCallback(() => {
     if (map) {
       setBounds(map.getBounds());
     }
     // console.log(map?.getBounds());
-  }, [map]);
+  }, [map, setBounds]);
 
   useEffect(() => {
     if (map) {
@@ -105,7 +127,9 @@ export default function MapComponent() {
         className="w-full h-full"
         ref={setMap}
       >
-        {baseMaps.OpenStreetMap}
+        {/* {baseMaps.OpenStreetMap} */}
+        {/* {baseMaps.StadiaDark} */}
+        {baseMaps.StadiaOrthoPhoto}
         {/* <LayersControl>
         {Object.entries(overlayMaps).map((entry) => (
           <LayersControl.Overlay name={entry[0]} key={entry[0]} checked={false}>
@@ -115,25 +139,42 @@ export default function MapComponent() {
       </LayersControl>
 {/*  */}
         <LayersControl>
-          {mapImages.map((image) => (
-            <>
-              <ImageOverlay
-                url={image.url}
-                bounds={image.bounds}
-                key={image.url}
-              />
-              <Rectangle bounds={image.bounds} />
-            </>
-          ))}
+          {mapImages.map((image) => {
+            console.log(image);
+            return (
+              <>
+                <ImageOverlay
+                  url={image.url}
+                  bounds={image.bounds}
+                  key={image.url}
+                  opacity={1}
+                />
+                {/* <Rectangle bounds={image.bounds} /> */}
+              </>
+            );
+          })}
         </LayersControl>
-        <Marker position={[51.505, -0.09]}>
+        {markers.map((marker) => {
+          // console.log(marker);
+          return (
+            <Marker position={marker.coords} key={marker.coords.toString()} icon={customIcon}>
+              <Popup>
+                <div>
+                  <p>{Array.isArray(marker.coords) ? marker.coords[0] : marker.coords.lat}</p>
+                  <p>{Array.isArray(marker.coords) ? marker.coords[1] : marker.coords.lng}</p>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+        <Marker position={[56.69, 26.56]} icon={customIcon}>
           <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
+            A pretty CSS3 popup. <br /> Easily customizable
           </Popup>
         </Marker>
       </MapContainer>
     ),
-    []
+    [mapImages, markers]
   );
 
   return displayMap;
