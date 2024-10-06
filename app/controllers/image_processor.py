@@ -138,7 +138,7 @@ class ImageProcessor:
                 [255, 0, 128, 64],    # Light Green (semi-transparent)
                 [255, 0, 255, 64],    # Yellow (opaque)
                 [128, 0, 255, 64],    # Orange (opaque)
-                [0, 0, 255, 64],      # Red (opaque)
+                [0, 0, 255, 128],      # Red (opaque)
             ], dtype=np.uint8)
         
         # Normalize grayscale image values to the range of [0, len(custom_colors)-1]
