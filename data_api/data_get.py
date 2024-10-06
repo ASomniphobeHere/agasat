@@ -47,7 +47,7 @@ class Data_get:
             "area": [self.tl_lat, self.tl_lon, self.br_lat, self.br_lon]
         }
         
-        client = cdsapi.Client(url="https://ads.atmosphere.copernicus.eu/api", key="***REMOVED***")
+        client = cdsapi.Client(url="https://ads.atmosphere.copernicus.eu/api", key="***YOUR CDS API KEY***")
         target = "data/co2_data.grib"
         client.retrieve(dataset, request, target)
         

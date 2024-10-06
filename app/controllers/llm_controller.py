@@ -1,8 +1,8 @@
 from openai import OpenAI
 
 # Set your OpenAI API key here or load it from an environment variable
-# openai_api_key = "***REMOVED***"
-openai_api_key = "***REMOVED***"
+# openai_api_key = "***YOUR OPENAI API KEY***"
+openai_api_key = "***YOUR OPENAI API KEY***"
 client = OpenAI(api_key=openai_api_key)
 
 
