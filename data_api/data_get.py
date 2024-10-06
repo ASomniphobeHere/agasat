@@ -6,8 +6,10 @@ import numpy as np
 import requests as re
 from time import time
 import io
+import cv2
+import json
 
-DATASETS: tuple[str] = ("co2", "light")
+DATASETS: tuple[str] = ("co2", "light", "health")
 
 
 class Data_get:
@@ -23,7 +25,11 @@ class Data_get:
                 return self.__get_co2()
             case "light":
                 return self.__get_light()
-        
+            case "health":
+                return self.__get_health()
+            case _:
+                raise ValueError("Invalid dataset name")
+    
     def __file_to_b64(self, image: Image.Image) -> str:
         buffered = io.BytesIO()
         image.save(buffered, format="PNG")
@@ -82,6 +88,42 @@ class Data_get:
         maped = lights.convert("L")
         maped = maped.resize((1000, 1000))
         return self.__file_to_b64(maped)
+    
+    def __get_health(self) -> str:
+        with open("dataset_api/data.json", "r") as file:
+            data = json.load(file)
+        
+        
+        image = np.zeros((1000, 1000, 4), dtype=np.uint8)
+        image[:, :, 3] = 255  # Set the alpha channel to fully opaque
+        
+        radius = 5000 // (abs(self.tl_lat - self.br_lat) * 111.1 )
+        
+        for location in data["coords"]:
+            loc_lat = location[1]
+            loc_lon = location[0]
+            if loc_lat > self.tl_lat and loc_lat < self.br_lat and loc_lon > self.tl_lon and loc_lon < self.br_lon:
+                x = int((loc_lon - self.tl_lon) / (self.br_lon - self.tl_lon) * 1000)
+                y = int((self.tl_lat - loc_lat) / (self.tl_lat - self.br_lat) * 1000)
+                
+                # Create a blank image with transparency (RGBA)
+               
+                # Create a mask for the circle with opacity falloff
+                circle_mask = np.zeros((1000, 1000), dtype=np.uint8)
+                for r in range(0, int(radius), 5):
+                    intensity = int(255 * (1 - r / radius))  # Linear falloff
+                    temp_mask = np.zeros((1000, 1000), dtype=np.uint8)
+                    cv2.circle(temp_mask, (x, y), r, intensity, -1)  # Create a temporary mask
+                    circle_mask = np.maximum(circle_mask, temp_mask)  # Accumulate the intensity
+                # Add the circle to the image
+                for c in range(3):
+                    image[:, :, c] = np.maximum(image[:, :, c], circle_mask)
+                image[:, :, 3] = np.maximum(image[:, :, 3], circle_mask)
+
+                # Convert the image to PIL format and save
+        image_pil = Image.fromarray(image)
+        # image_pil.save("data/health_data.png")
+        return self.__file_to_b64(image_pil)
 
         
 # data_get = Data_get(54, 19, 55, 18)
