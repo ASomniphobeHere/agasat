@@ -1,6 +1,7 @@
 from fastapi import APIRouter, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import os
+import re
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from app.controllers.llm_controller import LLMController
@@ -109,6 +110,9 @@ def process_input(input: TextInput):
 
     # Step 7: Create a template user response
     response = location_response.split("Route:")[0]
+    response = re.sub("\n+", "\n", response)  # Remove extra newlines
+    response = re.sub("\*\*", "", response)  # Remove bold formatting
+    response = re.sub("\\\"", "", response)
 
     # Return the response with relevant details
     return {

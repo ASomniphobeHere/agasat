@@ -50,7 +50,6 @@ These are the datasets that are available:
     "hospital_proximity", doesnt have available data, measures how far away is the nearest hospital, high values means there is a hospital nearby, low values means there is no hospital nearby
 }
 If a dataset doesnt have available data, only include it in the relevant datasets and best location qualities, NOT the route to result.
-DONT MAKE STRETCHES IN REASONING, YOU REALLY SHOULDNT USE A DATASET IF IT DOESNT ACTUALLY CORRELATE WITH THE RESULT IN A STRAIGHTFORWARD WAY
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
 Try to make the model as simple as possible(use the least number of datasets) while also actually taking all the highly relevant datasets.

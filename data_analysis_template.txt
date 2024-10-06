@@ -127,4 +127,5 @@ ALWAYS PASS ALL PARAMETERS TO THE FUNCTION!!!
 
 After applying these functions we will extract n places with the highest pixel value in the final_result image, and assign them to be the answer.
 
+I repeat: the resulting answer should be a raw string, not a json string
 Use all of this information to create a statistics mask that closely answers the user question.
