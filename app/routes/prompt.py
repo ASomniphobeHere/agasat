@@ -69,6 +69,8 @@ def process_input(input: TextInput):
     datasets = get_datasets(output_json["datasets"], input.coordinates)
     # for key, value in datasets.items():
     #     ImageProcessor.show_image(value, window_name=key)  # Display the dataset images
+    all_datasets = output_json["datasets"].copy()
+    all_datasets.extend(output_json["datasets_missing"])
 
     # Step 4: Initialize the FunctionExecutor and run the sequence of functions
     executor = FunctionExecutor(datasets)
@@ -103,15 +105,12 @@ def process_input(input: TextInput):
     highlight_points_coords = [img_coord_to_gps(x, y) for x, y in highlight_points]
 
     # Step 7: Create a template user response
-    template_response = f"""
-    Found {len(highlight_points)} areas of interest based on your query. Here are the coordinates of these areas: {highlight_points_coords}.
-    Relevant datasets: {', '.join(output_json['datasets'])}.
-    """
+    response = location_response.split("Route:")[0]
 
     # Return the response with relevant details
     return {
         "input": input.text,
-        "response": template_response.strip(),
+        "response": response.strip(),
         "coordinates": input.coordinates,
         "highlight_points": highlight_points_coords,
         "final_image_url": f"/prompt/image/{final_image_filename}"

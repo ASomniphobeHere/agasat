@@ -43,9 +43,13 @@ def normalize(image):
 
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution, high values means high pollution,
-    "co2": CO2 emissions, low values means low emissions, high values means high emissions
+	"light": has available data, Light pollution, low values means low pollution, high values means high pollution,
+    "co2": has available data, CO2 emissions, low values means low emissions, high values means high emissions,
+    "elevation", doesnt have available data, elevation, low values means low elevation, high values means high elevation,
+    "hospital_proximity", doesnt have available data, measures how far away is the nearest hospital, high values means there is a hospital nearby, low values means there is no hospital nearby
 }
+If a dataset doesnt have available data, only include it in the relevant datasets and best location qualities, NOT the route to result.
+DONT MAKE STRETCHES IN REASONING, YOU REALLY SHOULDNT USE A DATASET IF IT DOESNT ACTUALLY CORRELATE WITH THE RESULT IN A STRAIGHTFORWARD WAY
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
 Try to make the model as simple as possible(use the least number of datasets) while also actually taking all the highly relevant datasets.

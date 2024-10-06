@@ -45,6 +45,7 @@ def normalize(image):
 Output JSON format as a pure string, don't include the bounding quotation marks:
 {
 	"datasets": ["light", ...(other dataset names)],
+    "datasets_missing": ["elevation", ...(other datasets that dont have available data but still are correlated)],
 	"functions": [
 		{
 			"func": "name of the function",
@@ -62,9 +63,12 @@ If you pass images as parameters, instead of writing the variables as themselves
 
 These are the datasets that are available:
 {
-	"light": Light pollution, low values means low pollution, high values means high pollution,
-    "co2": CO2 emissions, low values means low emissions, high values means high emissions
+	"light": has available data, Light pollution, low values means low pollution, high values means high pollution,
+    "co2": has available data, CO2 emissions, low values means low emissions, high values means high emissions,
+    "elevation", doesnt have available data, elevation, low values means low elevation, high values means high elevation,
+    "hospital_proximity", doesnt have available data, measures how far away is the nearest hospital, high values means there is a hospital nearby, low values means there is no hospital nearby
 }
+If a dataset doesnt have available data, only include it in the output json key "datasets_missing", nothing else
 
 You DON'T HAVE TO use all of the datasets, use only the ones that actually are relevant to the question.
 
